@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Lib — لوحة الإدارة</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Login -->
+  <div id="loginView">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-logo" aria-hidden="true">📚</div>
+        <div>
+          <h1>Smart Lib</h1>
+          <p>لوحة إدارة المكتبة الذكية</p>
+        </div>
+      </div>
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">البريد الإلكتروني</label>
+          <input id="loginEmail" type="email" value="admin@smartlib.local" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">كلمة المرور</label>
+          <input id="loginPassword" type="password" value="admin123" autocomplete="current-password" required />
+        </div>
+        <button type="submit" id="loginBtn" class="btn btn-accent btn-block">تسجيل الدخول</button>
+      </form>
+      <p id="loginError" class="hidden error-msg"></p>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="appView" class="hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-sm" aria-hidden="true">📚</div>
+        <span>Smart Lib Admin</span>
+      </div>
+      <nav class="nav-scroll" aria-label="القائمة الرئيسية">
+        <button class="nav-item active" data-tab="authors">
+          <span class="nav-icon">✍️</span>
+          المؤلفون
+          <span class="nav-badge" id="badgeAuthors">0</span>
+        </button>
+        <button class="nav-item" data-tab="categories">
+          <span class="nav-icon">🏷️</span>
+          الأصناف
+          <span class="nav-badge" id="badgeCategories">0</span>
+        </button>
+        <button class="nav-item" data-tab="books">
+          <span class="nav-icon">📖</span>
+          الكتب
+          <span class="nav-badge" id="badgeBooks">0</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn btn-ghost btn-block">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="stats-row">
+        <div class="stat-card accent">
+          <div class="stat-label">المؤلفون</div>
+          <div class="stat-value" id="statAuthors">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">الأصناف</div>
+          <div class="stat-value" id="statCategories">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">الكتب</div>
+          <div class="stat-value" id="statBooks">0</div>
+        </div>
+      </div>
+
+      <!-- Authors -->
+      <div id="authorsPanel">
+        <div class="page-header">
+          <div>
+            <h2>المؤلفون</h2>
+            <p>إضافة وتعديل مؤلفي الكتب</p>
+          </div>
+          <button id="newAuthorBtn" class="btn btn-accent">+ مؤلف جديد</button>
+        </div>
+        <div class="panel-card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الاسم</th><th>نبذة</th><th>إجراءات</th></tr></thead>
+              <tbody id="authorsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div id="categoriesPanel" class="hidden">
+        <div class="page-header">
+          <div>
+            <h2>الأصناف</h2>
+            <p>روايات، تاريخي، شعر…</p>
+          </div>
+        </div>
+        <div class="panel-card">
+          <div class="toolbar">
+            <input id="newCategoryName" class="toolbar-grow" placeholder="اسم الصنف الجديد" />
+            <input id="newCategoryDesc" class="toolbar-grow" placeholder="وصف (اختياري)" />
+            <button id="addCategoryBtn" class="btn btn-accent">إضافة صنف</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الاسم</th><th>Slug</th><th>الوصف</th><th></th></tr></thead>
+              <tbody id="categoriesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Books -->
+      <div id="booksPanel" class="hidden">
+        <div class="page-header">
+          <div>
+            <h2>الكتب</h2>
+            <p>إدارة الكتب ونشر المحتوى</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button id="seedBtn" class="btn btn-secondary">☁️ استيراد seed</button>
+            <button id="newBookBtn" class="btn btn-accent">+ كتاب جديد</button>
+          </div>
+        </div>
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input id="bookSearch" type="search" placeholder="بحث بالعنوان أو المؤلف…" />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>الكتاب</th><th>المؤلف</th><th>الحالة</th><th>فصول</th><th>إجراءات</th></tr>
+              </thead>
+              <tbody id="booksTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Author modal -->
+  <div id="authorModal" class="modal-backdrop hidden" role="dialog">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="authorModalTitle">مؤلف</h2>
+        <button type="button" class="btn btn-ghost btn-icon modal-close" data-close="authorModal" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="authorName">الاسم *</label>
+          <input id="authorName" placeholder="مثال: طه حسين" />
+        </div>
+        <div class="field">
+          <label for="authorBio">نبذة</label>
+          <textarea id="authorBio" placeholder="سيرة مختصرة…" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label for="authorAvatar">رابط الصورة</label>
+          <input id="authorAvatar" type="url" placeholder="https://…" dir="ltr" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveAuthorBtn" class="btn btn-accent">حفظ</button>
+        <button type="button" class="btn btn-secondary modal-close" data-close="authorModal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book modal -->
+  <div id="bookModal" class="modal-backdrop hidden" role="dialog">
+    <div class="modal modal-book">
+      <div class="modal-header">
+        <div>
+          <h2 id="bookModalTitle">كتاب</h2>
+          <p class="modal-subtitle">يمكن ربط الكتاب بأكثر من صنف</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-icon modal-close" data-close="bookModal" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <div class="form-section-title">المعلومات الأساسية</div>
+          <div class="field">
+            <label for="bookTitle">العنوان *</label>
+            <input id="bookTitle" placeholder="عنوان الكتاب" />
+          </div>
+          <div class="field">
+            <label for="bookDescription">الوصف</label>
+            <textarea id="bookDescription" placeholder="ملخص الكتاب للقارئ…" rows="3"></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="bookAuthorId">المؤلف *</label>
+              <select id="bookAuthorId" class="form-select"></select>
+            </div>
+            <div class="field">
+              <label>حالة النشر</label>
+              <div class="status-toggle" role="group" aria-label="حالة النشر">
+                <button type="button" class="status-option" data-status="draft">مسودة</button>
+                <button type="button" class="status-option" data-status="published">منشور</button>
+              </div>
+              <input type="hidden" id="bookPublishStatus" value="draft" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            الأصناف *
+            <span class="form-section-count" id="categorySelectedCount">0 محدد</span>
+          </div>
+          <div class="category-picker" id="bookCategoryPicker">
+            <div class="selected-categories-bar" id="selectedCategoriesBar">
+              <span class="picker-placeholder" id="categoryPickerPlaceholder">لم تُختر أصناف بعد — اضغط أدناه</span>
+              <div id="selectedCategoryChips" class="selected-chips"></div>
+            </div>
+            <div class="category-picker-toolbar">
+              <div class="search-wrap picker-search">
+                <span class="search-icon">🔍</span>
+                <input id="categoryPickerSearch" type="search" placeholder="بحث في الأصناف…" />
+              </div>
+              <button type="button" id="selectAllCategoriesBtn" class="btn btn-ghost btn-sm">تحديد الكل</button>
+              <button type="button" id="clearCategoriesBtn" class="btn btn-ghost btn-sm">مسح</button>
+            </div>
+            <div id="categoryPickerGrid" class="category-picker-grid"></div>
+            <p class="field-hint" id="categoryPickerHint">اضغط على الصنف لإضافته أو إزالته</p>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">إعدادات إضافية</div>
+          <div class="field-row">
+            <div class="field">
+              <label for="bookLanguage">اللغة</label>
+              <input id="bookLanguage" value="ar" />
+            </div>
+            <div class="field">
+              <label for="bookCoverUrl">رابط الغلاف</label>
+              <input id="bookCoverUrl" type="url" placeholder="https://…" dir="ltr" />
+            </div>
+          </div>
+          <p class="field-hint">💡 أضف الفصول بعد الحفظ من زر «فصول» في جدول الكتب</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveBookBtn" class="btn btn-accent">حفظ الكتاب</button>
+        <button type="button" class="btn btn-secondary modal-close" data-close="bookModal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chapters modal -->
+  <div id="chaptersModal" class="modal-backdrop hidden" role="dialog">
+    <div class="modal wide">
+      <div class="modal-header">
+        <h2 id="chaptersModalTitle">الفصول</h2>
+        <button type="button" class="btn btn-ghost btn-icon modal-close" data-close="chaptersModal" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="chaptersList" class="chapters-list"></div>
+        <hr class="modal-divider" />
+        <p class="section-title">إضافة فصل جديد</p>
+        <div class="add-chapter-box">
+          <div class="field">
+            <label for="newChapterTitle">عنوان الفصل</label>
+            <input id="newChapterTitle" placeholder="الفصل الأول…" />
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label for="newChapterContent">نص الفصل</label>
+            <textarea id="newChapterContent" rows="5" placeholder="محتوى الفصل…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="addChapterBtn" class="btn btn-accent">+ إضافة فصل</button>
+        <button type="button" class="btn btn-secondary modal-close" data-close="chaptersModal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit chapter modal -->
+  <div id="editChapterModal" class="modal-backdrop hidden" role="dialog">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>تعديل الفصل</h2>
+        <button type="button" class="btn btn-ghost btn-icon modal-close" data-close="editChapterModal" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editChapterId" />
+        <div class="field">
+          <label for="editChapterTitle">العنوان</label>
+          <input id="editChapterTitle" />
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="editChapterContent">النص</label>
+          <textarea id="editChapterContent" rows="8"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveChapterBtn" class="btn btn-accent">حفظ التعديلات</button>
+        <button type="button" class="btn btn-secondary modal-close" data-close="editChapterModal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" aria-live="polite"></div>
+  <div id="loadingOverlay" class="loading-overlay hidden"><div class="spinner"></div></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
