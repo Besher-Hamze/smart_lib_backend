@@ -79,6 +79,13 @@ export class SeedService {
             estimatedReadMinutes: estimateReadMinutes(ch.contentText),
           });
           chaptersUpserted++;
+        } else {
+          existing.title = ch.title;
+          existing.contentText = ch.contentText;
+          existing.wordCount = wordCount(ch.contentText);
+          existing.estimatedReadMinutes = estimateReadMinutes(ch.contentText);
+          await existing.save();
+          chaptersUpserted++;
         }
       }
 
